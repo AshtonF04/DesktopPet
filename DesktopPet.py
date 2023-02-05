@@ -20,8 +20,8 @@ class pet():
         self.lastAction = time.time()
         self.actionCooldown = 15
 
-        self.groundHeight = self.screenHeight - int((self.screenHeight * 0.09))
-        self.jumpHeight = self.screenHeight - int((self.screenHeight * 0.13))
+        self.groundHeight = self.screenHeight - int((self.screenHeight * 0.055))
+        self.jumpHeight = self.screenHeight - int((self.screenHeight * 0.10))
         self.jumpHeightReached = False
 
         # timestamp to check whether to advance frame
@@ -54,8 +54,14 @@ class pet():
         # give window to geometry manager (so it will appear)
         self.label.pack()
 
+        # force window on top
+        def placeTop():
+            self.window.lift()
+            self.window.after(12, placeTop) # call every 10ms
+
         # run self.update() after 0ms when mainloop starts
         self.window.after(0, self.update)
+        placeTop()
         self.window.mainloop()
 
     
@@ -131,7 +137,7 @@ class pet():
         # give window to geometry manager (so it will appear)
         self.label.pack()
 
-        # call update after 12ms
+        # call update after 10ms
         self.window.after(12, self.update)
 
 pet()
