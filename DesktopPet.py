@@ -5,6 +5,8 @@ import random
 class pet():
     def __init__(self):
         self.window = tk.Tk()
+        self.screenWidth = self.window.winfo_screenwidth()
+        self.screenHeight = self.window.winfo_screenheight()
 
         # set images
         self.walking_right = [tk.PhotoImage(file='images\\walking_right_duck.gif', format='gif -index %i' % (i)) for i in range(10)]
@@ -18,6 +20,8 @@ class pet():
         self.lastAction = time.time()
         self.actionCooldown = 15
 
+        self.groundHeight = self.screenHeight - int((self.screenHeight * 0.09))
+        self.jumpHeight = self.screenHeight - int((self.screenHeight * 0.13))
         self.jumpHeightReached = False
 
         # timestamp to check whether to advance frame
@@ -40,7 +44,7 @@ class pet():
 
         # create a window of size 128x128 pixels, at coordinates 0,0
         self.x = 0
-        self.y = 765
+        self.y = self.groundHeight
         self.window.geometry('64x64+{x}+{y}'.format(x=str(self.x), y=str(self.y)))
         
 
@@ -80,7 +84,7 @@ class pet():
         #Movement
         if self.state == 0: # Move Right
             self.x += 1 
-            if self.x >= 1450: # Change direction at edge
+            if self.x >= self.screenWidth: # Change direction at edge
                 self.changeState(1)
             
         elif self.state == 1: # Move Left
@@ -96,11 +100,11 @@ class pet():
 
             if not self.jumpHeightReached:
                 self.y -= 1
-                if self.y <= 725:
+                if self.y <= self.jumpHeight:
                     self.jumpHeightReached = True
             else:
                 self.y += 1
-                if self.y >= 765:
+                if self.y >= self.groundHeight:
                     self.changeState(self.prevstate)
                     self.jumpHeightReached = False
                 
