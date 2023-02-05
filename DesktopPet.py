@@ -118,7 +118,7 @@ class pet():
         if time.time() > self.timestamp + 0.05:
             self.timestamp = time.time()
             # check if direction changed and advance frame
-            self.frame_index = (self.frame_index + 1) % 5
+            self.frame_index = (self.frame_index + 1) % 10
 
             if self.state == 0:
                 self.img = self.walking_right[self.frame_index]
