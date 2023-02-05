@@ -26,7 +26,7 @@ class pet():
         self.actionCooldown = 15
 
         # jump attributes
-        self.groundHeight = self.screenHeight - 64
+        self.groundHeight = self.screenHeight - int((self.screenHeight * 0.09))
         self.jumpHeight = self.screenHeight - int((self.screenHeight * 0.13))
         self.jumpHeightReached = False
 
@@ -74,7 +74,6 @@ class pet():
             self.window.after(12, placeTop) # call every 12ms
 
         # run self.update() after 0ms when mainloop starts
-        placeTop()
         self.window.after(0, self.update)
         self.window.mainloop()
 
