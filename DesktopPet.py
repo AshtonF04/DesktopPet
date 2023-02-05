@@ -14,15 +14,25 @@ class pet():
         self.frame_index = 0
         self.img = self.walking_right[self.frame_index]
 
-        # states / actions
+        #movement attributes
+        self.moveSpeed = 1
+
+        # states
         self.state = 0
         self.prevstate = 0
+
+        # action cooldowns
         self.lastAction = time.time()
         self.actionCooldown = 15
 
-        self.groundHeight = self.screenHeight - int((self.screenHeight * 0.055))
-        self.jumpHeight = self.screenHeight - int((self.screenHeight * 0.10))
+        # jump attributes
+        self.groundHeight = self.screenHeight - int((self.screenHeight * 0.09))
+        self.jumpHeight = self.screenHeight - int((self.screenHeight * 0.13))
         self.jumpHeightReached = False
+
+        # run away attributes
+        self.runDuration = 5
+        self.stopRunTime = 0
 
         # timestamp to check whether to advance frame
         self.timestamp = time.time()
@@ -51,17 +61,20 @@ class pet():
         # add the image to our label
         self.label.configure(image=self.img)
 
+        # add clickable methods
+        self.label.bind("<Button-1>", self.runAway)
+
         # give window to geometry manager (so it will appear)
         self.label.pack()
 
-        # force window on top
+        
+        # force window on top of windows ui
         def placeTop():
             self.window.lift()
-            self.window.after(12, placeTop) # call every 10ms
+            self.window.after(12, placeTop) # call every 12ms
 
         # run self.update() after 0ms when mainloop starts
         self.window.after(0, self.update)
-        placeTop()
         self.window.mainloop()
 
     
@@ -69,7 +82,16 @@ class pet():
         self.lastAction = time.time()
         self.prevstate = self.state
         self.state = newState
-        
+
+        if self.state == 4:
+            self.moveSpeed = 3
+            self.stopRunTime = time.time() + self.runDuration
+        else:
+            self.moveSpeed = 1
+
+    def runAway(self, *args):
+        self.changeState(4)
+
 
     def update(self):
         #random action
@@ -89,20 +111,16 @@ class pet():
 
         #Movement
         if self.state == 0: # Move Right
-            self.x += 1 
-            if self.x >= self.screenWidth: # Change direction at edge
-                self.changeState(1)
+            self.x += self.moveSpeed 
             
         elif self.state == 1: # Move Left
-            self.x -= 1
-            if self.x <= 0: # Change direction at edge
-                self.changeState(0)
+            self.x -= self.moveSpeed 
 
         elif self.state == 3: # Jump
             if self.prevstate == 0:
-                self.x += 1
+                self.x += self.moveSpeed 
             else:
-                self.x -= 1
+                self.x -= self.moveSpeed 
 
             if not self.jumpHeightReached:
                 self.y -= 1
@@ -113,22 +131,43 @@ class pet():
                 if self.y >= self.groundHeight:
                     self.changeState(self.prevstate)
                     self.jumpHeightReached = False
+        elif self.state == 4: # Run away
+            if self.prevstate == 0:
+                self.x -= self.moveSpeed
+            else:
+                self.x += self.moveSpeed
+
+            if time.time() >= self.stopRunTime:
+                self.changeState(self.prevstate)
+
+        # loop screen
+        if self.x >= self.screenWidth + 70:
+            self.x = -70
+        elif self.x <= -70:
+            self.x = self.screenWidth + 70
+                  
                 
         # Advance frame every 50ms
         if time.time() > self.timestamp + 0.05:
             self.timestamp = time.time()
-            # check if direction changed and advance frame
+            
+            # Choose animation based off state
             self.frame_index = (self.frame_index + 1) % 10
 
-            if self.state == 0:
+            if self.state == 0: # Animate walking right
                 self.img = self.walking_right[self.frame_index]
-            elif self.state == 1:
+            elif self.state == 1: # Animate walking left
                 self.img = self.walking_left[self.frame_index]
-            else:
+            elif self.state == 3: # Play correct walking animation for jump direction
                 if self.prevstate == 0:
                     self.img = self.walking_right[self.frame_index]
                 else:
                     self.img = self.walking_left[self.frame_index]
+            else: # Animate run away
+                if self.prevstate == 0:
+                    self.img = self.walking_left[self.frame_index]
+                else:
+                    self.img = self.walking_right[self.frame_index]
 
         # create the window
         self.window.geometry('64x64+{x}+{y}'.format(x=str(self.x), y=str(self.y)))
