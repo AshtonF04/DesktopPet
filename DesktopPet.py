@@ -1,12 +1,18 @@
 import tkinter as tk
 import time
 import random
+from win32api import GetMonitorInfo, MonitorFromPoint
 
 class pet():
     def __init__(self):
         self.window = tk.Tk()
-        self.screenWidth = self.window.winfo_screenwidth()
-        self.screenHeight = self.window.winfo_screenheight()
+
+        # get screen area minus taskbar
+        monitorInfo = GetMonitorInfo(MonitorFromPoint((0,0)))
+        workArea = monitorInfo.get("Work")
+        
+        self.screenWidth = workArea[2]
+        self.screenHeight = workArea[3]
 
         # set images
         self.walking_right = [tk.PhotoImage(file='images\\walking_right_duck.gif', format='gif -index %i' % (i)) for i in range(10)]
@@ -26,7 +32,7 @@ class pet():
         self.actionCooldown = 15
 
         # jump attributes
-        self.groundHeight = self.screenHeight - int((self.screenHeight * 0.09))
+        self.groundHeight = self.screenHeight - 60
         self.jumpHeight = self.screenHeight - int((self.screenHeight * 0.13))
         self.jumpHeightReached = False
 
