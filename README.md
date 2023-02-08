@@ -1,6 +1,5 @@
 # DesktopPet
-VERSION 0.1
+VERSION 1
 
--Added duck rendering
--Added duck horizontal movement
--Added duck random actions i.e. Jumping, turning mid screen
+-exe is included on github however some antivirus may not let you download to your device
+-all code is provided in the event youd like to modify/add onto the program
